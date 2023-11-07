@@ -1,3 +1,6 @@
+⚠️  This integration is in developement, don't expect any feature to be working
+
+
 # Radio-France for home-assistant
 
 Component to display information about currently airing emissions on Radio France stations
