@@ -23,16 +23,20 @@ _LOGGER = logging.getLogger(__name__)
 # HA calls async_setup_entry from sensor.py
 
 API_KEY_SCHEMA = vol.Schema(
-    {vol.Required(CONF_API_KEY, default="api key from developers.radiofrance.fr"): cv.string}
+    {
+        vol.Required(
+            CONF_API_KEY, default="api key from developers.radiofrance.fr"
+        ): cv.string
+    }
 )
 
-async def get_radio_stations(hass: HomeAssistant, token: str) -> dict[str,str]:
+
+async def get_radio_stations(hass: HomeAssistant, token: str) -> dict[str, str]:
     try:
         client = RadioFranceApi(token)
         return await client.get_stations()
     except ValueError as exc:
         raise exc
-
 
 
 class SetupConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -72,5 +76,13 @@ class SetupConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_create_entry(title="radio_france", data=self.data)
         all_stations = await get_radio_stations(self.hass, self.data[CONF_API_KEY])
         default_station = list(all_stations.keys())[0]
-        RADIO_STATIONS_SCHEMA = vol.Schema({vol.Required(CONF_RADIO_STATION, default=default_station): vol.In(all_stations)})
-        return self._show_setup_form("radio_station_selection", None, RADIO_STATIONS_SCHEMA, errors)
+        RADIO_STATIONS_SCHEMA = vol.Schema(
+            {
+                vol.Required(CONF_RADIO_STATION, default=default_station): vol.In(
+                    all_stations
+                )
+            }
+        )
+        return self._show_setup_form(
+            "radio_station_selection", None, RADIO_STATIONS_SCHEMA, errors
+        )

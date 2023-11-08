@@ -111,7 +111,9 @@ class RadioFranceAPICoordinator(DataUpdateCoordinator):
             try:
                 data = await api.get_programs()
             except RadioFranceApiError as e:
-                raise UpdateFailed(f"Failed fetching data from radio france api: {e.text}")
+                raise UpdateFailed(
+                    f"Failed fetching data from radio france api: {e.text}"
+                )
 
             return data
         except Exception as err:
@@ -132,7 +134,9 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
         self._attr_name = f"Airing now on {self.config_entry.data[CONF_RADIO_STATION]}"
         self._attr_native_value = None
         self._attr_state_attributes = None
-        self._attr_unique_id = f"sensor.radio_france.{self/config_entry.data[CONF_RADIO_STATION]}"
+        self._attr_unique_id = (
+            f"sensor.radio_france.{self/config_entry.data[CONF_RADIO_STATION]}"
+        )
 
         self._attr_device_info = DeviceInfo(
             name=f"{NAME} {config_entry.data.get(CONF_RADIO_STATION)}",

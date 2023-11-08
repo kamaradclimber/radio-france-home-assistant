@@ -14,14 +14,15 @@ _LOGGER = logging.getLogger(__name__)
 class RadioFranceApi:
     """Api to get Radio France data"""
 
-
     def __init__(
         self,
         token: str,
     ) -> None:
-        self._transport = AIOHTTPTransport(url=f"https://openapi.radiofrance.fr/v1/graphql?x-token={token}")
+        self._transport = AIOHTTPTransport(
+            url=f"https://openapi.radiofrance.fr/v1/graphql?x-token={token}"
+        )
 
-    async def get_stations(self) -> dict[str,str]:
+    async def get_stations(self) -> dict[str, str]:
         """Get stations list"""
 
         station_list_query = """
@@ -52,7 +53,6 @@ class RadioFranceApi:
                 }
                 """
 
-
         if os.getenv("RADIOFRANCE_STUB"):
             result = STATIONS_LIST_STUB
         else:
@@ -69,7 +69,6 @@ class RadioFranceApi:
         return stations
 
     async def get_data(self, zipcode) -> dict:
-
         # FIXME: data fetch should be implemented here
 
         return data
