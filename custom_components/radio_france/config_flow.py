@@ -26,10 +26,9 @@ API_KEY_SCHEMA = vol.Schema(
     {vol.Required(CONF_API_KEY, default="api key from developers.radiofrance.fr"): cv.string}
 )
 
-async def get_radio_stations(hass: HomeAssistant) -> list[str]:
-    session = async_get_clientsession(hass)
+async def get_radio_stations(hass: HomeAssistant, token: str) -> dict[str,str]:
     try:
-        client = RadioFranceApi(session)
+        client = RadioFranceApi(token)
         return await client.get_stations()
     except ValueError as exc:
         raise exc
@@ -61,16 +60,17 @@ class SetupConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             self.data = user_input
-            return await self.async_radio_station_selection()
+            return await self.async_step_radio_station_selection()
         return self._show_setup_form("user", user_input, API_KEY_SCHEMA, errors)
 
-    async def async_radio_station_selection(self, user_input=None):
+    async def async_step_radio_station_selection(self, user_input=None):
         """Handle selection of radio station amongst possible values"""
         errors = {}
         if user_input is not None:
             radio_station = user_input.get(CONF_RADIO_STATION)
             self.data[CONF_RADIO_STATION] = radio_station
             return self.async_create_entry(title="radio_france", data=self.data)
-        all_stations = await get_radio_stations(self.hass)
-        RADIO_STATIONS_SCHEMA = vol.Schema({vol.Required(CONF_RADIO_STATION, default=""): vol.In(all_stations)})
-        return self._show_setup_form("location", None, RADIO_STATIONS_SCHEMA, errors)
+        all_stations = await get_radio_stations(self.hass, self.data[CONF_API_KEY])
+        default_station = list(all_stations.keys())[0]
+        RADIO_STATIONS_SCHEMA = vol.Schema({vol.Required(CONF_RADIO_STATION, default=default_station): vol.In(all_stations)})
+        return self._show_setup_form("radio_station_selection", None, RADIO_STATIONS_SCHEMA, errors)
