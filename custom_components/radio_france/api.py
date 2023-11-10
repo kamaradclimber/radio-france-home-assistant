@@ -11,6 +11,9 @@ from .const import STATIONS_LIST_STUB
 _LOGGER = logging.getLogger(__name__)
 
 
+class RadioFranceApiError(Exception):
+    pass
+
 class RadioFranceApi:
     """Api to get Radio France data"""
 
@@ -21,6 +24,9 @@ class RadioFranceApi:
         self._transport = AIOHTTPTransport(
             url=f"https://openapi.radiofrance.fr/v1/graphql?x-token={token}"
         )
+
+    async def get_programs(self) -> list:
+        return []
 
     async def get_stations(self) -> dict[str, str]:
         """Get stations list"""
@@ -67,8 +73,3 @@ class RadioFranceApi:
         for brand in result["brands"]:
             stations[brand["id"]] = brand["title"]
         return stations
-
-    async def get_data(self, zipcode) -> dict:
-        # FIXME: data fetch should be implemented here
-
-        return data

@@ -8,7 +8,6 @@ from zoneinfo import ZoneInfo
 from typing import Any, Dict, Optional, Tuple
 from dateutil import tz
 from itertools import dropwhile, takewhile
-import aiohttp
 
 
 from homeassistant.const import Platform, STATE_ON
@@ -131,11 +130,12 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
     ):
         super().__init__(coordinator)
         self.hass = hass
+        self.config_entry = config_entry
         self._attr_name = f"Airing now on {self.config_entry.data[CONF_RADIO_STATION]}"
         self._attr_native_value = None
         self._attr_state_attributes = None
         self._attr_unique_id = (
-            f"sensor.radio_france.{self/config_entry.data[CONF_RADIO_STATION]}"
+            f"sensor.radio_france.{self.config_entry.data[CONF_RADIO_STATION]}-airing-now"
         )
 
         self._attr_device_info = DeviceInfo(
