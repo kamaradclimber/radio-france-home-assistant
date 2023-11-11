@@ -1,4 +1,4 @@
-⚠️  This integration is in developement, don't expect any feature to be working
+⚠️  This integration is in developement, expect entities to disappear.
 
 
 # Radio-France for home-assistant
@@ -12,3 +12,5 @@ It must be used as a custom repository via hacs.
 ## Configuration
 
 Once the custom integration has been added, add `radio_france` integration through the UI.
+
+You need an api key, see https://developers.radiofrance.fr/doc for details.
