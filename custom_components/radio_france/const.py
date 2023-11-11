@@ -4,6 +4,111 @@ NAME = "Radio France"
 CONF_API_KEY = "api_key"
 CONF_RADIO_STATION = "radio_station"
 
+GRID_STUB = {
+    "grid": [
+        {
+            "id": "0fed7bad-5d17-4c8e-a7f7-376b0b18810f_1",
+            "diffusion": {
+                "id": "9a206f82-155d-46e4-a5f1-3af9c64a7041_1",
+                "title": "Le journal de 18h du week-end du samedi 11 novembre 2023",
+                "standFirst": "",
+                "published_date": "1699722000",
+                "url": None,
+            },
+        },
+        {
+            "id": "3b8c72b2-eedf-4617-86ae-2b65790568ed_1",
+            "diffusion": {
+                "id": "7fbaa99d-bde8-4084-abfd-44770cff8aae_1",
+                "title": "Complotisme et fausses informations ou la guerre des récits ",
+                "standFirst": "L’essor du complotisme se manifeste d’abord par une modification du statut de la réalité factuelle dans le débat public. Les faits deviendraient-ils des opinions comme les autres ? ",
+                "published_date": "1699722665",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/en-quete-de-politique/en-quete-de-politique-du-samedi-11-novembre-2023-8139324",
+            },
+        },
+        {
+            "id": "9514afca-2825-4172-9818-9a7894c4c9bf_1",
+            "diffusion": {
+                "id": "a52b6a72-34f6-4d0c-95bd-2f03645ecf74_1",
+                "title": "Le journal de 19h du week-end du samedi 11 novembre 2023",
+                "standFirst": "",
+                "published_date": "1699725600",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/le-journal-de-19h-du-week-end/le-journal-de-19h-du-week-end-du-samedi-11-novembre-2023-8285292",
+            },
+        },
+        {
+            "id": "a7cd5928-fde4-458a-b707-f6fbb0ed816f_1",
+            "diffusion": {
+                "id": "cc2eea1e-b849-465d-a232-e7eb99f6a60e_1",
+                "title": 'Luz : "L\'humour est mort"',
+                "standFirst": "Dans sa nouvelle BD, Luz propose une dystopie dans laquelle un virus s'attaque aux hommes et à leur virilité en faisant baisser leur taux de testostérone. Jean-Pat', \"le héros voit sa vision du monde changer..",
+                "published_date": "1699726685",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/bistroscopie/bistroscopie-du-samedi-11-novembre-2023-8796179",
+            },
+        },
+        {
+            "id": "0979c3b3-d70a-4503-9e49-2b8ae817610f_1",
+            "diffusion": {
+                "id": "97e2af3c-70a9-45fe-870e-052b4b27a372_1",
+                "title": "Expression directe du samedi 11 novembre 2023",
+                "standFirst": "",
+                "published_date": "1699728880",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/expression-directe/expression-directe-du-samedi-11-novembre-2023-7488510",
+            },
+        },
+        {
+            "id": "a464b686-f263-4dfd-ba6f-113016ad0da2_1",
+            "diffusion": {
+                "id": "3d8de564-ce90-4e0d-a949-a1cd930c5f67_1",
+                "title": 'Anne Mardon "Aux sévices de l\'église"',
+                "standFirst": 'Lanceuse d’alerte, ancienne membre d’une communauté religieuse, Anne Mardon est l’une des premières à parler des  violences systémiques, commises souvent au nom de Dieu, au sein de l’Eglise, et toujours plus ou moins couvertes par la hiérarchie. \nElle témoigne dans le livre "Aux sévices de l\'Eglise"',
+                "published_date": "1699729490",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/en-marge/en-marge-du-samedi-11-novembre-2023-1040554",
+            },
+        },
+        {
+            "id": "69523ee5-c3bc-47f3-9784-978dd68bf380_1",
+            "diffusion": {
+                "id": "86ca67bd-82c4-46f7-8944-b9dc4d157df5_1",
+                "title": "La radio de Beirut avec Zach Condon",
+                "standFirst": 'Zach Condon fait sa première "Radio de" : le compositeur, musicien et chanteur américain, leader du groupe Beirut nous embarque dans la balade intime de ses musiques préférées... sur France Inter.',
+                "published_date": "1699733090",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/la-radio-de/la-radio-de-du-samedi-11-novembre-2023-9530787",
+            },
+        },
+        {
+            "id": "92db5941-32f3-4e94-aec7-e0c7994015a0_1",
+            "diffusion": {
+                "id": "f32d08cb-f127-4de0-9453-b6875cb2d8c6_1",
+                "title": "Zeus, le menteur",
+                "standFirst": "Récit d'une ultime bataille qui n'a jamais eu lieu. Celle où les Grecs s'attendaient à triompher des Troyens. Mais Zeus trompe l'esprit des Grecs en soutient à Achille, par le faux rêve envoyé à Agamemnon pour lui faire croire qu’il gagnerait le choc décisif, qui n'advient jamais. ",
+                "published_date": "1699697090",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/quand-les-dieux-rodaient-sur-la-terre/quand-les-dieux-rodaient-sur-la-terre-du-samedi-11-novembre-2023-1818235",
+            },
+        },
+        {
+            "id": "549975bb-4cf5-46ca-b5fb-5cd80c5ad2e4_1",
+            "diffusion": {
+                "id": "436a288b-9f4d-42ba-aefd-9532a4637189_1",
+                "title": "Le journal de 23h du samedi 11 novembre 2023",
+                "standFirst": "",
+                "published_date": "1699740000",
+                "url": None,
+            },
+        },
+        {
+            "id": "9bcdca4e-50f1-4c8e-9d7b-e29ab50746be_1",
+            "diffusion": {
+                "id": "7e09dfb7-1744-4415-b8d6-1e6d523911b3_1",
+                "title": 'Martine Le Corre, au nom des miens 2/4 "L\'école a occasionné des blessures terribles en moi."',
+                "standFirst": "Militante du mouvement ATD Quart Monde depuis 50 ans, Martine Le Corre revient sur son parcours marqué par la honte d'appartenir à une famille qui ne rentrait pas dans les cases. Excellente élève en primaire, l'école a pourtant été pour elle un lieu de grande souffrance et d'humiliation permanente. ",
+                "published_date": "1699743065",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/des-vies-francaises/des-vies-francaises-du-samedi-11-novembre-2023-1797240",
+            },
+        },
+    ]
+}
+
 STATIONS_LIST_STUB = {
     "brands": [
         {

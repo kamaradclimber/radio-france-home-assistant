@@ -1,8 +1,11 @@
 import logging
+from datetime import timedelta
+import asyncio
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity import EntityPlatformState
 
 from .const import DOMAIN
 from . import AiringNowEntity
@@ -18,4 +21,5 @@ async def async_setup_entry(
     sensors.append(AiringNowEntity(api_coordinator, hass, entry))
 
     async_add_entities(sensors)
-    await api_coordinator.async_config_entry_first_refresh()
+    await asyncio.sleep(0.2)  # FIXME: we should not need to sleep here!
+    await api_coordinator.async_request_refresh()

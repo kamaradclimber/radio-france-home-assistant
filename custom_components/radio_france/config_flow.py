@@ -2,7 +2,6 @@ import logging
 from typing import Any, Optional, Tuple
 import voluptuous as vol
 from homeassistant.core import callback, HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant import config_entries
 from .api import RadioFranceApi

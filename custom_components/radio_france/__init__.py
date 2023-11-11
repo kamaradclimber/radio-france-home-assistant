@@ -21,15 +21,16 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from homeassistant.helpers.debounce import Debouncer
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.components.sensor import RestoreSensor, SensorEntity
 from .const import (
     DOMAIN,
     NAME,
     CONF_RADIO_STATION,
+    CONF_API_KEY,
 )
-from .api import RadioFranceApi
+from .api import RadioFranceApi, RadioFranceApiError
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,11 +88,13 @@ class RadioFranceAPICoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name="radio france api",  # for logging purpose
-            update_interval=timedelta(hours=1),
+            update_interval=timedelta(minutes=60),
             update_method=self.update_method,
         )
         self.config = config
         self.hass = hass
+        self.station_code = config[CONF_RADIO_STATION]
+        self.api_token = config[CONF_API_KEY]
 
     async def update_method(self):
         """Fetch data from API endpoint."""
@@ -105,10 +108,9 @@ class RadioFranceAPICoordinator(DataUpdateCoordinator):
                 )
             _LOGGER.debug("Starting collecting data")
 
-            session = async_get_clientsession(self.hass)
-            api = RadioFranceApi(session)
+            api = RadioFranceApi(self.api_token)
             try:
-                data = await api.get_programs()
+                data = await api.get_programs(self.station_code)
             except RadioFranceApiError as e:
                 raise UpdateFailed(
                     f"Failed fetching data from radio france api: {e.text}"
@@ -128,15 +130,14 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
         hass: HomeAssistant,
         config_entry: ConfigEntry,
     ):
-        super().__init__(coordinator)
+        CoordinatorEntity.__init__(self, coordinator)
+        self._coordinator = coordinator
         self.hass = hass
         self.config_entry = config_entry
         self._attr_name = f"Airing now on {self.config_entry.data[CONF_RADIO_STATION]}"
         self._attr_native_value = None
-        self._attr_state_attributes = None
-        self._attr_unique_id = (
-            f"sensor.radio_france.{self.config_entry.data[CONF_RADIO_STATION]}-airing-now"
-        )
+        self._attr_state_attributes = {}
+        self._attr_unique_id = f"sensor.radio_france.{self.config_entry.entry_id}.{self.config_entry.data[CONF_RADIO_STATION]}-airing-now"
 
         self._attr_device_info = DeviceInfo(
             name=f"{NAME} {config_entry.data.get(CONF_RADIO_STATION)}",
@@ -156,7 +157,35 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
         if not self.coordinator.last_update_success:
             _LOGGER.debug("Last coordinator failed, assuming state has not changed")
             return
-        self._attr_native_value = self.coordinator.data["niveauAlerte"]
+        now = int(datetime.now().timestamp())
+        programs = self.coordinator.data
+        consecutive_programs = [
+            (programs[i], programs[i + 1]) for i in range(len(programs) - 1)
+        ]
+        current_program = None
+        for p1, p2 in consecutive_programs:
+            if now in range(
+                int(p1["diffusion"]["published_date"]),
+                int(p2["diffusion"]["published_date"]),
+            ):
+                current_program = p1
+                break
+        if current_program is None:
+            now_dt = datetime.fromtimestamp(now)
+            first_program_start = datetime.fromtimestamp(
+                int(programs[0]["diffusion"]["published_date"])
+            )
+            last_program_start = datetime.fromtimestamp(
+                int(programs[-1]["diffusion"]["published_date"])
+            )
+            raise Exception(
+                f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_start}"
+            )
+        self._attr_native_value = current_program["diffusion"]["title"]
+        self._attr_state_attributes["description"] = current_program["diffusion"][
+            "standFirst"
+        ]
+        self._attr_state_attributes["url"] = current_program["diffusion"]["url"]
 
         self.async_write_ha_state()
 
