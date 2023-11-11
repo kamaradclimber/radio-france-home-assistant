@@ -7,27 +7,21 @@ CONF_RADIO_STATION = "radio_station"
 GRID_STUB = {
     "grid": [
         {
-            "id": "0fed7bad-5d17-4c8e-a7f7-376b0b18810f_1",
-            "diffusion": {
-                "id": "9a206f82-155d-46e4-a5f1-3af9c64a7041_1",
-                "title": "Le journal de 18h du week-end du samedi 11 novembre 2023",
-                "standFirst": "",
-                "published_date": "1699722000",
-                "url": None,
-            },
-        },
-        {
             "id": "3b8c72b2-eedf-4617-86ae-2b65790568ed_1",
+            "start": 1699722665,
+            "end": 1699725599,
             "diffusion": {
                 "id": "7fbaa99d-bde8-4084-abfd-44770cff8aae_1",
                 "title": "Complotisme et fausses informations ou la guerre des récits ",
-                "standFirst": "L’essor du complotisme se manifeste d’abord par une modification du statut de la réalité factuelle dans le débat public. Les faits deviendraient-ils des opinions comme les autres ? ",
+                "standFirst": "L’essor du complotisme se manifeste d’abord par une modification du statut de la réalité factuelle dans le débat public. Les faits deviendraient-ils des opinions comme les autres\xa0? ",
                 "published_date": "1699722665",
                 "url": "https://www.franceinter.fr/franceinter/podcasts/en-quete-de-politique/en-quete-de-politique-du-samedi-11-novembre-2023-8139324",
             },
         },
         {
             "id": "9514afca-2825-4172-9818-9a7894c4c9bf_1",
+            "start": 1699725600,
+            "end": 1699726685,
             "diffusion": {
                 "id": "a52b6a72-34f6-4d0c-95bd-2f03645ecf74_1",
                 "title": "Le journal de 19h du week-end du samedi 11 novembre 2023",
@@ -38,9 +32,11 @@ GRID_STUB = {
         },
         {
             "id": "a7cd5928-fde4-458a-b707-f6fbb0ed816f_1",
+            "start": 1699726685,
+            "end": 1699728630,
             "diffusion": {
                 "id": "cc2eea1e-b849-465d-a232-e7eb99f6a60e_1",
-                "title": 'Luz : "L\'humour est mort"',
+                "title": 'Luz\xa0: "L\'humour est mort"',
                 "standFirst": "Dans sa nouvelle BD, Luz propose une dystopie dans laquelle un virus s'attaque aux hommes et à leur virilité en faisant baisser leur taux de testostérone. Jean-Pat', \"le héros voit sa vision du monde changer..",
                 "published_date": "1699726685",
                 "url": "https://www.franceinter.fr/franceinter/podcasts/bistroscopie/bistroscopie-du-samedi-11-novembre-2023-8796179",
@@ -48,6 +44,8 @@ GRID_STUB = {
         },
         {
             "id": "0979c3b3-d70a-4503-9e49-2b8ae817610f_1",
+            "start": 1699728880,
+            "end": 1699729199,
             "diffusion": {
                 "id": "97e2af3c-70a9-45fe-870e-052b4b27a372_1",
                 "title": "Expression directe du samedi 11 novembre 2023",
@@ -58,6 +56,8 @@ GRID_STUB = {
         },
         {
             "id": "a464b686-f263-4dfd-ba6f-113016ad0da2_1",
+            "start": 1699729490,
+            "end": 1699732799,
             "diffusion": {
                 "id": "3d8de564-ce90-4e0d-a949-a1cd930c5f67_1",
                 "title": 'Anne Mardon "Aux sévices de l\'église"',
@@ -68,6 +68,8 @@ GRID_STUB = {
         },
         {
             "id": "69523ee5-c3bc-47f3-9784-978dd68bf380_1",
+            "start": 1699733090,
+            "end": 1699736399,
             "diffusion": {
                 "id": "86ca67bd-82c4-46f7-8944-b9dc4d157df5_1",
                 "title": "La radio de Beirut avec Zach Condon",
@@ -78,6 +80,8 @@ GRID_STUB = {
         },
         {
             "id": "92db5941-32f3-4e94-aec7-e0c7994015a0_1",
+            "start": 1699736670,
+            "end": 1699740000,
             "diffusion": {
                 "id": "f32d08cb-f127-4de0-9453-b6875cb2d8c6_1",
                 "title": "Zeus, le menteur",
@@ -88,6 +92,8 @@ GRID_STUB = {
         },
         {
             "id": "549975bb-4cf5-46ca-b5fb-5cd80c5ad2e4_1",
+            "start": 1699740000,
+            "end": 1699740785,
             "diffusion": {
                 "id": "436a288b-9f4d-42ba-aefd-9532a4637189_1",
                 "title": "Le journal de 23h du samedi 11 novembre 2023",
@@ -98,12 +104,26 @@ GRID_STUB = {
         },
         {
             "id": "9bcdca4e-50f1-4c8e-9d7b-e29ab50746be_1",
+            "start": 1699743065,
+            "end": 1699743619,
             "diffusion": {
                 "id": "7e09dfb7-1744-4415-b8d6-1e6d523911b3_1",
                 "title": 'Martine Le Corre, au nom des miens 2/4 "L\'école a occasionné des blessures terribles en moi."',
                 "standFirst": "Militante du mouvement ATD Quart Monde depuis 50 ans, Martine Le Corre revient sur son parcours marqué par la honte d'appartenir à une famille qui ne rentrait pas dans les cases. Excellente élève en primaire, l'école a pourtant été pour elle un lieu de grande souffrance et d'humiliation permanente. ",
                 "published_date": "1699743065",
                 "url": "https://www.franceinter.fr/franceinter/podcasts/des-vies-francaises/des-vies-francaises-du-samedi-11-novembre-2023-1797240",
+            },
+        },
+        {
+            "id": "2db204dd-18a3-4cd4-8bb5-7913595d02dc_1",
+            "start": 1699743865,
+            "end": 1699746622,
+            "diffusion": {
+                "id": "a303e053-466a-47b1-864e-ca02b6bd082d_1",
+                "title": "Robert Guédiguian et Barbet Schroeder",
+                "standFirst": "S’il n’y avait qu’un seul mot pour relier ces deux films ce serait peut-être bien celui-là\xa0: L’engagement dans une cause ou dans un art, la peinture. Oui, l’humain et la croyance à l’intérieur de ces deux films. ",
+                "published_date": "1699693970",
+                "url": "https://www.franceinter.fr/franceinter/podcasts/on-aura-tout-vu/on-aura-tout-vu-du-samedi-11-novembre-2023-9121080",
             },
         },
     ]

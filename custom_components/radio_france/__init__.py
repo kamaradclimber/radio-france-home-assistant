@@ -24,6 +24,7 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.helpers.debounce import Debouncer
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.components.sensor import RestoreSensor, SensorEntity
+from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from .const import (
     DOMAIN,
     NAME,
@@ -51,7 +52,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     # will make sure async_setup_entry from sensor.py is called
-    await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
+    await hass.config_entries.async_forward_entry_setups(
+        entry, [Platform.SENSOR, Platform.CALENDAR]
+    )
 
     # subscribe to config updates
     entry.async_on_unload(entry.add_update_listener(update_entry))
@@ -159,27 +162,17 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
             return
         now = int(datetime.now().timestamp())
         programs = self.coordinator.data
-        consecutive_programs = [
-            (programs[i], programs[i + 1]) for i in range(len(programs) - 1)
-        ]
         current_program = None
-        for p1, p2 in consecutive_programs:
-            if now in range(
-                int(p1["diffusion"]["published_date"]),
-                int(p2["diffusion"]["published_date"]),
-            ):
-                current_program = p1
+        for p in programs:
+            if now in range(p["start"], p["end"]):
+                current_program = p
                 break
         if current_program is None:
             now_dt = datetime.fromtimestamp(now)
-            first_program_start = datetime.fromtimestamp(
-                int(programs[0]["diffusion"]["published_date"])
-            )
-            last_program_start = datetime.fromtimestamp(
-                int(programs[-1]["diffusion"]["published_date"])
-            )
+            first_program_start = datetime.fromtimestamp(programs[0]["start"])
+            last_program_end = datetime.fromtimestamp(programs[-1]["end"])
             raise Exception(
-                f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_start}"
+                f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
             )
         self._attr_native_value = current_program["diffusion"]["title"]
         self._attr_state_attributes["description"] = current_program["diffusion"][
@@ -192,3 +185,71 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
     @property
     def state_attributes(self):
         return self._attr_state_attributes
+
+
+class AiringCalendar(CoordinatorEntity, CalendarEntity):
+    def __init__(
+        self,
+        coordinator: RadioFranceAPICoordinator,
+        hass: HomeAssistant,
+        config_entry: ConfigEntry,
+    ):
+        CoordinatorEntity.__init__(self, coordinator)
+        self._coordinator = coordinator
+        self.hass = hass
+        self.config_entry = config_entry
+        self._attr_name = f"{self.config_entry.data[CONF_RADIO_STATION]} calendar"
+        self._attr_unique_id = f"calendar.radio_france.{self.config_entry.entry_id}.{self.config_entry.data[CONF_RADIO_STATION]}"
+        self._events = []
+
+        self._attr_device_info = DeviceInfo(
+            name=f"{NAME} {config_entry.data.get(CONF_RADIO_STATION)}",
+            entry_type=DeviceEntryType.SERVICE,
+            identifiers={
+                (
+                    DOMAIN,
+                    str(config_entry.data.get(CONF_RADIO_STATION)),
+                )
+            },
+            manufacturer=NAME,
+        )
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        _LOGGER.debug(f"Receiving an update for {self.unique_id} calendar")
+        if not self.coordinator.last_update_success:
+            _LOGGER.debug("Last coordinator failed, assuming state has not changed")
+            return
+        programs = self.coordinator.data
+
+        self._events = []
+        for p in programs:
+            self._events.append(
+                CalendarEvent(
+                    start=datetime.fromtimestamp(p["start"], self.timezone()),
+                    end=datetime.fromtimestamp(p["end"], self.timezone()),
+                    summary=p["diffusion"]["title"],
+                    description=p["diffusion"]["standFirst"],
+                    location=p["diffusion"]["url"],
+                    uid=p["id"],
+                )
+            )
+        self.async_write_ha_state()
+
+    def timezone(self):
+        timezone = self.hass.config.as_dict()["time_zone"]
+        return tz.gettz(timezone)
+
+    async def async_get_events(
+        self, hass: HomeAssistant, start_date: datetime, end_date: datetime
+    ) -> list[CalendarEvent]:
+        return [e for e in self._events if e.end >= start_date and e.start <= end_date]
+
+    @property
+    def event(self) -> CalendarEvent | None:
+        now = int(datetime.now().timestamp())
+        now_dt = datetime.fromtimestamp(now, self.timezone())
+        for e in self._events:
+            if e.start <= now_dt and e.end >= now_dt:
+                return e
+        return None

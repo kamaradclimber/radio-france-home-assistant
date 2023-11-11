@@ -41,6 +41,8 @@ class RadioFranceApi:
           ) {{
             ... on DiffusionStep {{
               id
+              start
+              end
               diffusion {{
                 id
                 title
@@ -51,6 +53,8 @@ class RadioFranceApi:
             }}
             ... on TrackStep {{
               id
+              start
+              end
               track {{
                 id
                 title
@@ -60,6 +64,8 @@ class RadioFranceApi:
             ... on BlankStep {{
               id
               title
+              start
+              end
               }}
             }}
           }}
