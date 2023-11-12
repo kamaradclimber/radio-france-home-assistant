@@ -9,8 +9,6 @@ assignees: ''
 
 **Describe the bug**
 
-:warning: Please add your location (either the name of your city or GPS coordinates of your HA instance). It is usually very helpful to reproduce issues you face.
-
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
