@@ -179,11 +179,16 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
                 f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
             )
         old_value = self._attr_native_value
-        self._attr_native_value = current_program["diffusion"]["title"]
-        self._attr_state_attributes["description"] = current_program["diffusion"][
-            "standFirst"
-        ]
-        self._attr_state_attributes["url"] = current_program["diffusion"]["url"]
+        if current_program["diffusion"] is not None:
+            self._attr_native_value = current_program["diffusion"]["title"]
+            self._attr_state_attributes["description"] = current_program["diffusion"][
+                "standFirst"
+            ]
+            if "url" in current_program["diffusion"]:
+                self._attr_state_attributes["url"] = current_program["diffusion"]["url"]
+        else:
+            self._attr_native_value = "No diffusion"
+            self._attr_state_attributes = current_program
 
         if old_value != self._attr_native_value:
             self.async_write_ha_state()
@@ -235,16 +240,27 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
 
         self._events = []
         for p in programs:
-            self._events.append(
-                CalendarEvent(
-                    start=datetime.fromtimestamp(p["start"], self.timezone()),
-                    end=datetime.fromtimestamp(p["end"], self.timezone()),
-                    summary=p["diffusion"]["title"],
-                    description=p["diffusion"]["standFirst"],
-                    location=p["diffusion"]["url"],
-                    uid=p["id"],
+            if p["diffusion"] is None:
+                self._events.append(
+                    CalendarEvent(
+                        start=datetime.fromtimestamp(p["start"], self.timezone()),
+                        end=datetime.fromtimestamp(p["end"], self.timezone()),
+                        summary="No information",
+                        description="there is no information on this diffusion",
+                        uid=p["id"],
+                    )
                 )
-            )
+            else:
+                self._events.append(
+                    CalendarEvent(
+                        start=datetime.fromtimestamp(p["start"], self.timezone()),
+                        end=datetime.fromtimestamp(p["end"], self.timezone()),
+                        summary=p["diffusion"]["title"],
+                        description=p["diffusion"]["standFirst"],
+                        location=p["diffusion"].get("url", None),
+                        uid=p["id"],
+                    )
+                )
         self.async_write_ha_state()
 
     def timezone(self):

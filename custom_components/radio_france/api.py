@@ -86,6 +86,14 @@ class RadioFranceApi:
 
         # conformity check
         for p in result["grid"]:
+            if "track" in p:
+                _LOGGER.debug(
+                    f"Convert track {p['track']['title']} to diffusion format"
+                )
+                p["diffusion"] = {
+                    "title": p["track"]["title"],
+                    "standFirst": f'From the album {p["track"]["albumTitle"]}',
+                }
             if "diffusion" not in p:
                 _LOGGER.warn(
                     f"Following program does not have the diffusion attribute: {p}. Please report this to the integration maintainer on https://github.com/kamaradclimber/radio-france-home-assistant/issues/new?assignees=&labels=&projects=&template=bug_report.md&title="
