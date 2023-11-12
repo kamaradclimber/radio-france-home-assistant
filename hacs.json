@@ -2,5 +2,5 @@
   "name": "Radio France",
   "render_readme": true,
   "country": "fr",
-  "homeassistant": "2023.11"
+  "homeassistant": "2023.11.0"
 }
