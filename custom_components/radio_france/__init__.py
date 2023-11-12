@@ -172,9 +172,9 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
                 current_program = p
                 break
         if current_program is None:
-            now_dt = datetime.fromtimestamp(now)
-            first_program_start = datetime.fromtimestamp(programs[0]["start"])
-            last_program_end = datetime.fromtimestamp(programs[-1]["end"])
+            now_dt = datetime.fromtimestamp(now, self.timezone())
+            first_program_start = datetime.fromtimestamp(programs[0]["start"], self.timezone())
+            last_program_end = datetime.fromtimestamp(programs[-1]["end"], self.timezone())
             raise Exception(
                 f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
             )
@@ -192,6 +192,10 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
 
         if old_value != self._attr_native_value:
             self.async_write_ha_state()
+
+    def timezone(self):
+        timezone = self.hass.config.as_dict()["time_zone"]
+        return tz.gettz(timezone)
 
     @property
     def state_attributes(self):
