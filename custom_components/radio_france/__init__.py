@@ -160,6 +160,10 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
         if not self.coordinator.last_update_success:
             _LOGGER.debug("Last coordinator failed, assuming state has not changed")
             return
+
+    # this method is called every 30 seconds
+    async def async_update(self) -> None:
+        _LOGGER.debug(f"Starting update of {self._attr_unique_id}")
         now = int(datetime.now().timestamp())
         programs = self.coordinator.data
         current_program = None
@@ -174,17 +178,24 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
             raise Exception(
                 f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
             )
+        old_value = self._attr_native_value
         self._attr_native_value = current_program["diffusion"]["title"]
         self._attr_state_attributes["description"] = current_program["diffusion"][
             "standFirst"
         ]
         self._attr_state_attributes["url"] = current_program["diffusion"]["url"]
 
-        self.async_write_ha_state()
+        if old_value != self._attr_native_value:
+            self.async_write_ha_state()
 
     @property
     def state_attributes(self):
         return self._attr_state_attributes
+
+    @property
+    def should_poll(self) -> bool:
+        # by default, coordinatorentity are not polled
+        return True
 
 
 class AiringCalendar(CoordinatorEntity, CalendarEntity):

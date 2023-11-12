@@ -28,7 +28,7 @@ class RadioFranceApi:
         )
 
     async def get_programs(self, station_code: str) -> list:
-        start_ts = int(datetime.now().timestamp())
+        start_ts = int(datetime.now().timestamp()) - 2 * 3600
         end_ts = int(datetime.now().timestamp() + 6 * 3600)
         # note: all { are doubled because we format the string
         programs_query = """
