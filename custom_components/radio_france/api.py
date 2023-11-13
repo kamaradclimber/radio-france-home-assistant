@@ -144,4 +144,8 @@ class RadioFranceApi:
         stations = {}
         for brand in result["brands"]:
             stations[brand["id"]] = brand["title"]
+            for local_radio in (brand["localRadios"] or []):
+                stations[local_radio["id"]] = local_radio["title"]
+            for web_radio in (brand["webRadios"] or []):
+                stations[web_radio["id"]] = web_radio["title"]
         return stations
