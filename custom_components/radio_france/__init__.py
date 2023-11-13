@@ -181,9 +181,10 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
         old_value = self._attr_native_value
         if current_program["diffusion"] is not None:
             self._attr_native_value = current_program["diffusion"]["title"]
-            self._attr_state_attributes["description"] = current_program["diffusion"][
-                "standFirst"
-            ]
+            if "standFirst" in current_program["diffusion"]:
+                self._attr_state_attributes["description"] = current_program["diffusion"][
+                    "standFirst"
+                ]
             if "url" in current_program["diffusion"]:
                 self._attr_state_attributes["url"] = current_program["diffusion"]["url"]
         else:

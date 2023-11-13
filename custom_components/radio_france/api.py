@@ -84,6 +84,7 @@ class RadioFranceApi:
                 result = await session.execute(query)
                 _LOGGER.debug(result)
 
+        results = []
         # conformity check
         for p in result["grid"]:
             if "track" in p:
@@ -98,7 +99,9 @@ class RadioFranceApi:
                 _LOGGER.warn(
                     f"Following program does not have the diffusion attribute: {p}. Please report this to the integration maintainer on https://github.com/kamaradclimber/radio-france-home-assistant/issues/new?assignees=&labels=&projects=&template=bug_report.md&title="
                 )
-        return result["grid"]
+                p["diffusion"] = None
+            results.append(p)
+        return results
 
     async def get_stations(self) -> dict[str, str]:
         """Get stations list"""
