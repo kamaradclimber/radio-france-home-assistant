@@ -281,7 +281,17 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
     def event(self) -> CalendarEvent | None:
         now = int(datetime.now().timestamp())
         now_dt = datetime.fromtimestamp(now, self.timezone())
-        for e in self._events:
-            if e.start <= now_dt and e.end >= now_dt:
-                return e
+        matching_events = [
+            e for e in self._events if e.start <= now_dt and e.end >= now_dt
+        ]
+        matching_events.sort(key=lambda e: e.end - e.start)
+        if len(matching_events) > 0:
+            if len(matching_events) > 1:
+                _LOGGER.debug(
+                    f"Found {len(matching_events)} diffusions running simultaneously. Selecting the shortest one (likely a track during a longer show)"
+                )
+                _LOGGER.debug(
+                    f"Shortest one is {matching_events[0].summary}. Longest one is {matching_events[-1].summary}"
+                )
+            return matching_events[0]
         return None
