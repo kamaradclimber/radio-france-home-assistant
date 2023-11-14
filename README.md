@@ -16,6 +16,13 @@ Once the custom integration has been added, add `radio_france` integration throu
 
 You need an api key, see https://developers.radiofrance.fr/doc for details.
 
+## Exposed sensors
+
+At the moment, this integration exposes 3 entities per station:
+- "Airing now": exposing the currently aired program (like a show).
+- "Current track" exposing the currently aired music, if any.
+- a calendar exposing the recent past and planned program + tracks.
+
 ## Known issue
 
 FIP (and other music-only stations) is a special case and thus is not [supported yet](https://github.com/kamaradclimber/radio-france-home-assistant/issues/1).
