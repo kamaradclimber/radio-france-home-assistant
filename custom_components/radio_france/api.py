@@ -84,24 +84,7 @@ class RadioFranceApi:
                 result = await session.execute(query)
                 _LOGGER.debug(result)
 
-        results = []
-        # conformity check
-        for p in result["grid"]:
-            if "track" in p:
-                _LOGGER.debug(
-                    f"Convert track {p['track']['title']} to diffusion format"
-                )
-                p["diffusion"] = {
-                    "title": p["track"]["title"],
-                    "standFirst": f'From the album {p["track"]["albumTitle"]}',
-                }
-            if "diffusion" not in p:
-                _LOGGER.warn(
-                    f"Following program does not have the diffusion attribute: {p}. Please report this to the integration maintainer on https://github.com/kamaradclimber/radio-france-home-assistant/issues/new?assignees=&labels=&projects=&template=bug_report.md&title="
-                )
-                p["diffusion"] = None
-            results.append(p)
-        return results
+        return result["grid"]
 
     async def get_stations(self) -> dict[str, str]:
         """Get stations list"""
@@ -147,8 +130,8 @@ class RadioFranceApi:
         stations = {}
         for brand in result["brands"]:
             stations[brand["id"]] = brand["title"]
-            for local_radio in (brand["localRadios"] or []):
+            for local_radio in brand["localRadios"] or []:
                 stations[local_radio["id"]] = local_radio["title"]
-            for web_radio in (brand["webRadios"] or []):
+            for web_radio in brand["webRadios"] or []:
                 stations[web_radio["id"]] = web_radio["title"]
         return stations

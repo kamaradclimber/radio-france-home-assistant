@@ -8,7 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import EntityPlatformState
 
 from .const import DOMAIN
-from . import AiringNowEntity
+from . import AiringNowTrackEntity, AiringNowProgramEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,7 +18,8 @@ async def async_setup_entry(
 ) -> None:
     api_coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     sensors = []
-    sensors.append(AiringNowEntity(api_coordinator, hass, entry))
+    sensors.append(AiringNowProgramEntity(api_coordinator, hass, entry))
+    sensors.append(AiringNowTrackEntity(api_coordinator, hass, entry))
 
     async_add_entities(sensors)
     await asyncio.sleep(0.2)  # FIXME: we should not need to sleep here!

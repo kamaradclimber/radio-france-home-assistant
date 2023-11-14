@@ -87,9 +87,10 @@ class RadioFranceAPICoordinator(DataUpdateCoordinator):
     """A coordinator to fetch data from the api only once"""
 
     def __init__(self, hass, config: ConfigType):
+        self.logger = logging.getLogger(__name__ + ".coordinator")
         super().__init__(
             hass,
-            _LOGGER,
+            self.logger,
             name="radio france api",  # for logging purpose
             update_interval=timedelta(minutes=60),
             update_method=self.update_method,
@@ -102,14 +103,14 @@ class RadioFranceAPICoordinator(DataUpdateCoordinator):
     async def update_method(self):
         """Fetch data from API endpoint."""
         try:
-            _LOGGER.debug(
+            self.logger.debug(
                 f"Calling update method, {len(self._listeners)} listeners subscribed"
             )
             if "RADIOFRANCE_APIFAIL" in os.environ:
                 raise UpdateFailed(
                     "Failing update on purpose to test state restoration"
                 )
-            _LOGGER.debug("Starting collecting data")
+            self.logger.debug("Starting collecting data")
 
             api = RadioFranceApi(self.api_token)
             try:
@@ -124,7 +125,7 @@ class RadioFranceAPICoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Error communicating with API: {err}")
 
 
-class AiringNowEntity(CoordinatorEntity, SensorEntity):
+class AiringNowProgramEntity(CoordinatorEntity, SensorEntity):
     """Expose the program airing now on the given station"""
 
     def __init__(
@@ -133,6 +134,9 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
         hass: HomeAssistant,
         config_entry: ConfigEntry,
     ):
+        self.logger = logging.getLogger(
+            f"{__name__}.{config_entry.data[CONF_RADIO_STATION]}"
+        )
         CoordinatorEntity.__init__(self, coordinator)
         self._coordinator = coordinator
         self.hass = hass
@@ -156,39 +160,150 @@ class AiringNowEntity(CoordinatorEntity, SensorEntity):
 
     @callback
     def _handle_coordinator_update(self) -> None:
-        _LOGGER.debug(f"Receiving an update for {self.unique_id} sensor")
+        self.logger.debug(f"Receiving an update for {self.unique_id} sensor")
         if not self.coordinator.last_update_success:
-            _LOGGER.debug("Last coordinator failed, assuming state has not changed")
+            self.logger.debug("Last coordinator failed, assuming state has not changed")
             return
 
     # this method is called every 30 seconds
     async def async_update(self) -> None:
-        _LOGGER.debug(f"Starting update of {self._attr_unique_id}")
+        self.logger.debug(f"Starting update of {self._attr_unique_id}")
         now = int(datetime.now().timestamp())
         programs = self.coordinator.data
         current_program = None
         for p in programs:
+            if "diffusion" not in p or p["diffusion"] is None:
+                continue
             if now in range(p["start"], p["end"]):
                 current_program = p
                 break
+        old_value = self._attr_native_value
         if current_program is None:
             now_dt = datetime.fromtimestamp(now, self.timezone())
-            first_program_start = datetime.fromtimestamp(programs[0]["start"], self.timezone())
-            last_program_end = datetime.fromtimestamp(programs[-1]["end"], self.timezone())
+            first_program_start = datetime.fromtimestamp(
+                programs[0]["start"], self.timezone()
+            )
+            last_program_end = datetime.fromtimestamp(
+                programs[-1]["end"], self.timezone()
+            )
+            self._attr_native_value = None
+            self._attr_state_attributes = {}
+            if old_value != self._attr_native_value:
+                self.async_write_ha_state()
             raise Exception(
                 f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
             )
-        old_value = self._attr_native_value
         if current_program["diffusion"] is not None:
             self._attr_native_value = current_program["diffusion"]["title"]
             if "standFirst" in current_program["diffusion"]:
-                self._attr_state_attributes["description"] = current_program["diffusion"][
-                    "standFirst"
-                ]
+                self._attr_state_attributes["description"] = current_program[
+                    "diffusion"
+                ]["standFirst"]
             if "url" in current_program["diffusion"]:
                 self._attr_state_attributes["url"] = current_program["diffusion"]["url"]
         else:
             self._attr_native_value = "No diffusion"
+            self._attr_state_attributes = current_program
+
+        if old_value != self._attr_native_value:
+            self.async_write_ha_state()
+
+    def timezone(self):
+        timezone = self.hass.config.as_dict()["time_zone"]
+        return tz.gettz(timezone)
+
+    @property
+    def state_attributes(self):
+        return self._attr_state_attributes
+
+    @property
+    def should_poll(self) -> bool:
+        # by default, coordinatorentity are not polled
+        return True
+
+
+class AiringNowTrackEntity(CoordinatorEntity, SensorEntity):
+    """Expose the track airing now on the given station"""
+
+    def __init__(
+        self,
+        coordinator: RadioFranceAPICoordinator,
+        hass: HomeAssistant,
+        config_entry: ConfigEntry,
+    ):
+        self.logger = logging.getLogger(
+            f"{__name__}.{config_entry.data[CONF_RADIO_STATION]}"
+        )
+        CoordinatorEntity.__init__(self, coordinator)
+        self._coordinator = coordinator
+        self.hass = hass
+        self.config_entry = config_entry
+        self._attr_name = (
+            f"Current track on {self.config_entry.data[CONF_RADIO_STATION]}"
+        )
+        self._attr_native_value = None
+        self._attr_state_attributes = {}
+        self._attr_unique_id = f"sensor.radio_france.{self.config_entry.entry_id}.{self.config_entry.data[CONF_RADIO_STATION]}-airing-now-track"
+
+        self._attr_device_info = DeviceInfo(
+            name=f"{NAME} {config_entry.data.get(CONF_RADIO_STATION)}",
+            entry_type=DeviceEntryType.SERVICE,
+            identifiers={
+                (
+                    DOMAIN,
+                    str(config_entry.data.get(CONF_RADIO_STATION)),
+                )
+            },
+            manufacturer=NAME,
+        )
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        self.logger.debug(f"Receiving an update for {self.unique_id} sensor")
+        if not self.coordinator.last_update_success:
+            self.logger.debug("Last coordinator failed, assuming state has not changed")
+            return
+
+    # this method is called every 30 seconds
+    async def async_update(self) -> None:
+        self.logger.debug(f"Starting update of {self._attr_unique_id}")
+        now = int(datetime.now().timestamp())
+        programs = self.coordinator.data
+        current_program = None
+        for p in programs:
+            if "track" not in p or p["track"] is None:
+                continue
+            if now in range(p["start"], p["end"]):
+                current_program = p
+                break
+        old_value = self._attr_native_value
+        if current_program is None:
+            now_dt = datetime.fromtimestamp(now, self.timezone())
+            first_program_start = datetime.fromtimestamp(
+                programs[0]["start"], self.timezone()
+            )
+            last_program_end = datetime.fromtimestamp(
+                programs[-1]["end"], self.timezone()
+            )
+            self._attr_native_value = None
+            self._attr_state_attributes = {}
+            if old_value != self._attr_native_value:
+                self.async_write_ha_state()
+            if now_dt >= last_program_end:
+                # this is the case of FIP and other music-only station. See https://github.com/kamaradclimber/radio-france-home-assistant/issues/1
+                raise Exception(
+                    f"Unable to find currently airing track. Now is {now_dt}. First track starts at {first_program_start}, last track starts at {last_program_end}"
+                )
+            else:
+                return
+        if current_program["track"] is not None:
+            self._attr_native_value = current_program["track"]["title"]
+            if "albumTitle" in current_program["track"]:
+                self._attr_state_attributes["description"] = current_program["track"][
+                    "albumTitle"
+                ]
+        else:
+            self._attr_native_value = "No music currently played"
             self._attr_state_attributes = current_program
 
         if old_value != self._attr_native_value:
@@ -215,6 +330,9 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
         hass: HomeAssistant,
         config_entry: ConfigEntry,
     ):
+        self.logger = logging.getLogger(
+            f"{__name__}.{config_entry.data[CONF_RADIO_STATION]}"
+        )
         CoordinatorEntity.__init__(self, coordinator)
         self._coordinator = coordinator
         self.hass = hass
@@ -237,25 +355,25 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
 
     @callback
     def _handle_coordinator_update(self) -> None:
-        _LOGGER.debug(f"Receiving an update for {self.unique_id} calendar")
+        self.logger.debug(f"Receiving an update for {self.unique_id} calendar")
         if not self.coordinator.last_update_success:
-            _LOGGER.debug("Last coordinator failed, assuming state has not changed")
+            self.logger.debug("Last coordinator failed, assuming state has not changed")
             return
         programs = self.coordinator.data
 
         self._events = []
         for p in programs:
-            if p["diffusion"] is None:
+            if "track" in p and p["track"] is not None:
                 self._events.append(
                     CalendarEvent(
                         start=datetime.fromtimestamp(p["start"], self.timezone()),
                         end=datetime.fromtimestamp(p["end"], self.timezone()),
-                        summary="No information",
-                        description="there is no information on this diffusion",
+                        summary=p["track"]["title"],
+                        description=f"from album '{p['track']['albumTitle']}'",
                         uid=p["id"],
                     )
                 )
-            else:
+            elif "diffusion" in p and p["diffusion"] is not None:
                 self._events.append(
                     CalendarEvent(
                         start=datetime.fromtimestamp(p["start"], self.timezone()),
@@ -266,6 +384,17 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
                         uid=p["id"],
                     )
                 )
+            elif "title" in p:
+                self._events.append(
+                    CalendarEvent(
+                        start=datetime.fromtimestamp(p["start"], self.timezone()),
+                        end=datetime.fromtimestamp(p["end"], self.timezone()),
+                        summary=p["title"],
+                        uid=p["id"],
+                    )
+                )
+            else:
+                self.logger.warning(f"Event {p} is not handled yet by this integration")
         self.async_write_ha_state()
 
     def timezone(self):
@@ -287,10 +416,10 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
         matching_events.sort(key=lambda e: e.end - e.start)
         if len(matching_events) > 0:
             if len(matching_events) > 1:
-                _LOGGER.debug(
+                self.logger.debug(
                     f"Found {len(matching_events)} diffusions running simultaneously. Selecting the shortest one (likely a track during a longer show)"
                 )
-                _LOGGER.debug(
+                self.logger.debug(
                     f"Shortest one is {matching_events[0].summary}. Longest one is {matching_events[-1].summary}"
                 )
             return matching_events[0]
