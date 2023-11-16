@@ -200,9 +200,13 @@ class AiringNowProgramEntity(CoordinatorEntity, SensorEntity):
             self._attr_state_attributes = {}
             if old_value != self._attr_native_value:
                 self.async_write_ha_state()
-            raise Exception(
-                f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
-            )
+            if now_dt >= last_program_end:
+                # this is the case of FIP and other music-only station. See https://github.com/kamaradclimber/radio-france-home-assistant/issues/1
+                raise Exception(
+                    f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
+                )
+            else:
+                return
         if current_program["diffusion"] is not None:
             self._attr_native_value = current_program["diffusion"]["title"]
             if "standFirst" in current_program["diffusion"]:
