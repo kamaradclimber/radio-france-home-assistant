@@ -30,6 +30,7 @@ from .const import (
     NAME,
     CONF_RADIO_STATION,
     CONF_API_KEY,
+    LOW_HEADSUP_STATIONS,
 )
 from .api import RadioFranceApi, RadioFranceApiError
 
@@ -87,17 +88,26 @@ class RadioFranceAPICoordinator(DataUpdateCoordinator):
     """A coordinator to fetch data from the api only once"""
 
     def __init__(self, hass, config: ConfigType):
-        self.logger = logging.getLogger(__name__ + ".coordinator")
+        self.station_code = config[CONF_RADIO_STATION]
+        self.logger = logging.getLogger(f"{__name__}.{self.station_code}.coordinator")
+
+        update_interval = timedelta(minutes=60)
+        for station_matcher in LOW_HEADSUP_STATIONS:
+            if re.search(station_matcher, self.station_code):
+                self.logger.warn(
+                    "Data will be refreshed every two minutes because station does not publish program in advance"
+                )
+                update_interval = timedelta(minutes=2)
+
         super().__init__(
             hass,
             self.logger,
             name="radio france api",  # for logging purpose
-            update_interval=timedelta(minutes=60),
+            update_interval=update_interval,
             update_method=self.update_method,
         )
         self.config = config
         self.hass = hass
-        self.station_code = config[CONF_RADIO_STATION]
         self.api_token = config[CONF_API_KEY]
 
     async def update_method(self):

@@ -4,6 +4,10 @@ NAME = "Radio France"
 CONF_API_KEY = "api_key"
 CONF_RADIO_STATION = "radio_station"
 
+LOW_HEADSUP_STATIONS = [
+    "^FIP.*",
+]
+
 GRID_STUB = {
     "grid": [
         {
