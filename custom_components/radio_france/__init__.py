@@ -197,6 +197,7 @@ class AiringNowProgramEntity(CoordinatorEntity, SensorEntity):
                 programs[-1]["end"], self.timezone()
             )
             self._attr_native_value = None
+            self._attr_icon = "mdi:radio-off"
             self._attr_state_attributes = {}
             if old_value != self._attr_native_value:
                 self.async_write_ha_state()
@@ -208,6 +209,7 @@ class AiringNowProgramEntity(CoordinatorEntity, SensorEntity):
             else:
                 return
         if current_program["diffusion"] is not None:
+            self._attr_icon = "mdi:radio"
             self._attr_native_value = current_program["diffusion"]["title"]
             if "standFirst" in current_program["diffusion"]:
                 self._attr_state_attributes["description"] = current_program[
@@ -217,6 +219,7 @@ class AiringNowProgramEntity(CoordinatorEntity, SensorEntity):
                 self._attr_state_attributes["url"] = current_program["diffusion"]["url"]
         else:
             self._attr_native_value = "No diffusion"
+            self._attr_icon = "mdi:radio-off"
             self._attr_state_attributes = current_program
 
         if old_value != self._attr_native_value:
@@ -300,6 +303,7 @@ class AiringNowTrackEntity(CoordinatorEntity, SensorEntity):
                 programs[-1]["end"], self.timezone()
             )
             self._attr_native_value = None
+            self._attr_icon = "mdi:music-off"
             self._attr_state_attributes = {}
             if old_value != self._attr_native_value:
                 self.async_write_ha_state()
@@ -311,6 +315,7 @@ class AiringNowTrackEntity(CoordinatorEntity, SensorEntity):
             else:
                 return
         if current_program["track"] is not None:
+            self._attr_icon = "mdi:music"
             self._attr_native_value = current_program["track"]["title"]
             if "albumTitle" in current_program["track"]:
                 self._attr_state_attributes["description"] = current_program["track"][
@@ -318,6 +323,7 @@ class AiringNowTrackEntity(CoordinatorEntity, SensorEntity):
                 ]
         else:
             self._attr_native_value = "No music currently played"
+            self._attr_icon = "mdi:music-off"
             self._attr_state_attributes = current_program
 
         if old_value != self._attr_native_value:
