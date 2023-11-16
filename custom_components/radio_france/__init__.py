@@ -203,7 +203,7 @@ class AiringNowProgramEntity(CoordinatorEntity, SensorEntity):
             if now_dt >= last_program_end:
                 # this is the case of FIP and other music-only station. See https://github.com/kamaradclimber/radio-france-home-assistant/issues/1
                 raise Exception(
-                    f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program starts at {last_program_end}"
+                    f"Unable to find currently airing program. Now is {now_dt}. First program starts at {first_program_start}, last program stops at {last_program_end}"
                 )
             else:
                 return
@@ -306,7 +306,7 @@ class AiringNowTrackEntity(CoordinatorEntity, SensorEntity):
             if now_dt >= last_program_end:
                 # this is the case of FIP and other music-only station. See https://github.com/kamaradclimber/radio-france-home-assistant/issues/1
                 raise Exception(
-                    f"Unable to find currently airing track. Now is {now_dt}. First track starts at {first_program_start}, last track starts at {last_program_end}"
+                    f"Unable to find currently airing track. Now is {now_dt}. First track starts at {first_program_start}, last track stops at {last_program_end}"
                 )
             else:
                 return
