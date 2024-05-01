@@ -58,6 +58,8 @@ class RadioFranceApi:
               track {{
                 id
                 title
+                authors
+                mainArtists
                 albumTitle
                 }}
               }}

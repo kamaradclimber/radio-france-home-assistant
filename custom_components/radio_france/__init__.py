@@ -321,6 +321,10 @@ class AiringNowTrackEntity(CoordinatorEntity, SensorEntity):
                 self._attr_state_attributes["description"] = current_program["track"][
                     "albumTitle"
                 ]
+            if "mainArtists" in current_program["track"]:
+                self._attr_state_attributes["artists"] = ", ".join(
+                    current_program["track"]["mainArtists"]
+                )
         else:
             self._attr_native_value = "No music currently played"
             self._attr_icon = "mdi:music-off"
@@ -384,12 +388,13 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
         self._events = []
         for p in programs:
             if "track" in p and p["track"] is not None:
+                artists = ", ".join(p["track"]["mainArtists"])
                 self._events.append(
                     CalendarEvent(
                         start=datetime.fromtimestamp(p["start"], self.timezone()),
                         end=datetime.fromtimestamp(p["end"], self.timezone()),
                         summary=p["track"]["title"],
-                        description=f"from album '{p['track']['albumTitle']}'",
+                        description=f"by '{artists}' from album '{p['track']['albumTitle']}'",
                         uid=p["id"],
                     )
                 )
