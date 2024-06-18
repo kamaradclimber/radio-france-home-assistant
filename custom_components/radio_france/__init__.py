@@ -3,7 +3,7 @@ import re
 import json
 import urllib.parse
 import logging
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, tzinfo
 from zoneinfo import ZoneInfo
 from typing import Any, Dict, Optional, Tuple
 from dateutil import tz
@@ -25,6 +25,7 @@ from homeassistant.helpers.debounce import Debouncer
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.components.sensor import RestoreSensor, SensorEntity
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
+from homeassistant.util import dt as dt_util
 from .const import (
     DOMAIN,
     NAME,
@@ -225,9 +226,8 @@ class AiringNowProgramEntity(CoordinatorEntity, SensorEntity):
         if old_value != self._attr_native_value:
             self.async_write_ha_state()
 
-    def timezone(self):
-        timezone = self.hass.config.as_dict()["time_zone"]
-        return tz.gettz(timezone)
+    def timezone(self) -> tzinfo:
+        return dt_util.get_default_time_zone()
 
     @property
     def state_attributes(self):
@@ -333,9 +333,8 @@ class AiringNowTrackEntity(CoordinatorEntity, SensorEntity):
         if old_value != self._attr_native_value:
             self.async_write_ha_state()
 
-    def timezone(self):
-        timezone = self.hass.config.as_dict()["time_zone"]
-        return tz.gettz(timezone)
+    def timezone(self) -> tzinfo:
+        return dt_util.get_default_time_zone()
 
     @property
     def state_attributes(self):
@@ -422,9 +421,8 @@ class AiringCalendar(CoordinatorEntity, CalendarEntity):
                 self.logger.warning(f"Event {p} is not handled yet by this integration")
         self.async_write_ha_state()
 
-    def timezone(self):
-        timezone = self.hass.config.as_dict()["time_zone"]
-        return tz.gettz(timezone)
+    def timezone(self) -> tzinfo:
+        return dt_util.get_default_time_zone()
 
     async def async_get_events(
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
