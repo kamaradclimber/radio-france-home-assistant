@@ -1,7 +1,12 @@
 {
   "domain": "radio_france",
   "name": "Radio France",
-  "codeowners": ["@kamaradclimber"],
+  "categories": [
+    "media_entertainment.music_radio_services"
+  ],
+  "codeowners": [
+    "@kamaradclimber"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/kamaradclimber/radio-france-home-assistant",
   "integration_type": "device",
@@ -10,5 +15,5 @@
   "requirements": [
     "gql==3.4.1"
   ],
-  "version": "0.1.0"
+  "version": "0.4.2"
 }
